@@ -16,10 +16,16 @@
       <el-table-column prop="name" label="名称"></el-table-column>
       <el-table-column prop="age" label="年龄"></el-table-column>
       <el-table-column prop="phone" label="手机"></el-table-column>
+      <el-table-column prop="sex" label="性别"></el-table-column>
     </el-table>
     <!-- 分页 -->
-    <div style="margin-top:10px">
-      <el-pagination background page-size="5" layout="prev, pager, next" :total="tableData.length">
+    <div style="margin-top: 10px">
+      <el-pagination
+        background
+        :page-size="5"
+        layout="prev, pager, next"
+        :total="tableData.length"
+      >
       </el-pagination>
     </div>
   </div>
@@ -30,19 +36,21 @@ export default {
   name: "HomeView",
   data() {
     return {
-      tableData: [
-       { name: "王二", age: 20, phone: 13970259035 },
-        { name: "张三", age: 21, phone: 13970259035 },
-        { name: "里斯", age: 18, phone: 13970259035 },  { name: "王二", age: 20, phone: 13970259035 },
-        { name: "张三", age: 21, phone: 13970259035 },
-        { name: "里斯", age: 18, phone: 13970259035 },  { name: "王二", age: 20, phone: 13970259035 },
-        { name: "张三", age: 21, phone: 13970259035 },
-        { name: "里斯", age: 18, phone: 13970259035 },  { name: "王二", age: 20, phone: 13970259035 },
-     
-        { name: "里斯", age: 18, phone: 13970259035 },  { name: "王二", age: 20, phone: 13970259035 },
- 
-      ],
+      tableData: [],
     };
+  },
+  created() {
+    this.load();
+  },
+  methods: {
+    load() {
+      fetch("http://localhost:9090/user/list")
+        .then((res) => res.json())
+        .then((res) => {
+          console.log(res);
+          this.tableData = res;
+        });
+    },
   },
 };
 </script>
