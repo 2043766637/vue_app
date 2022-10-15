@@ -44,7 +44,7 @@
         </el-menu>
       </div>
       <!-- 主体数据 -->
-      <div style="flex: 1; background-color: white;padding:10px">
+      <div style="flex: 1; background-color: white;padding:10px;   ">
         <router-view />
       </div>
     </div>
