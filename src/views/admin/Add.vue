@@ -1,6 +1,6 @@
 <template>
   <div style="padding: 20px; width: 80%">
-    <h2>新增用户</h2>
+    <h2>新增管理员</h2>
     <el-form
       :inline="true"
       :model="form"
@@ -8,19 +8,15 @@
       ref="ruleForm"
       label-width="120px"
     >
-      <el-form-item label="姓名" prop="name">
-        <el-input v-model="form.name" placeholder="请输入姓名"></el-input>
+      <el-form-item label="用户名" prop="username">
+        <el-input v-model="form.username" placeholder="请输入用户名"></el-input>
       </el-form-item>
 
-      <el-form-item label="年龄" prop="age">
-        <el-input v-model="form.age" placeholder="请输入年龄"></el-input>
-      </el-form-item>
-      <el-form-item label="性别">
-        <el-radio v-model="form.sex" label="男"></el-radio>
-        <el-radio v-model="form.sex" label="女"></el-radio>
-      </el-form-item>
       <el-form-item label="联系方式" prop="phone">
         <el-input v-model="form.phone" placeholder="请输入联系方式"></el-input>
+      </el-form-item>
+      <el-form-item label="邮箱" prop="email">
+        <el-input v-model="form.email" placeholder="请输入邮箱"></el-input>
       </el-form-item>
     </el-form>
     <div style="text-align: center; margin-top: 30px">
@@ -35,18 +31,6 @@ import request from "@/utils/request";
 export default {
   name: "AddUser",
   data() {
-    var checkAge = (rule, value, callback) => {
-      if (!value) {
-        return callback(new Error("年龄不能为空"));
-      }
-      if (!/^[0-9]+$/.test(value)) {
-        callback(new Error("请输入数字值"));
-      }
-      if (parseInt(value) > 120 || parseInt(value) <= 0) {
-        callback(new Error("请输入合理年龄"));
-      }
-      callback();
-    };
     var checkPhone = (rule, value, callback) => {
       if (!/^[1][3,4,5,6,7,8,9][0-9]{9}$/.test(value)) {
         callback(new Error("请输入合法的手机号"));
@@ -54,15 +38,13 @@ export default {
       callback();
     };
     return {
-      form: {
-        sex: "男",
-      },
+      form: {},
       rules: {
-        name: [
-          { required: true, message: "请输入姓名", trigger: "blur" },
+        username: [
+          { required: true, message: "请输入用户名", trigger: "blur" },
+          { min: 3, max: 10, trigger: "blur", message: "长度在3-10个字符" },
           // { min: 3, max: 5, message: "长度在 3 到 5 个字符", trigger: "blur" },
         ],
-        age: [{ validator: checkAge, required: true, trigger: "blur" }],
         phone: [{ validator: checkPhone, trigger: "blur" }],
       },
     };
@@ -71,7 +53,7 @@ export default {
     save() {
       this.$refs["ruleForm"].validate((valid) => {
         if (valid) {
-          request.post("/user", this.form).then((res) => {
+          request.post("/admin", this.form).then((res) => {
             if (res.code === "200") {
               this.$notify.success("新增成功");
               this.$refs["ruleForm"].resetFields();

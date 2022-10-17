@@ -1,4 +1,5 @@
 import axios from "axios";
+import router from "@/router";
 const request = axios.create({
     baseURL: 'http://localhost:9090',
     timeout: 5000
@@ -7,6 +8,10 @@ const request = axios.create({
 
 request.interceptors.request.use(config => {
     config.headers['Content-Type'] = 'application/json;charset=utf-8';
+    const admin=localStorage.getItem("admin")
+    if(!admin){
+        router.push("/login")
+    }
     return config
 }, error => {
     return Promise.reject(error)
