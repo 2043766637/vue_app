@@ -5,8 +5,6 @@ import Layout from '../views/Layout.vue'
 Vue.use(VueRouter)
 
 const routes = [
-
-
   {
     path: '/login',
     name: 'Login',
@@ -61,6 +59,14 @@ const routes = [
 
     ]
   },
+
+  // ============  404  ======================
+  {
+    path: '*',
+    component: () => import('@/views/404.vue')
+  }
+
+
 ]
 
 const router = new VueRouter({
@@ -68,5 +74,18 @@ const router = new VueRouter({
   base: process.env.BASE_URL,
   routes
 })
+
+router.beforeEach((to, from, next) => {
+  if (to.path === '/login') {
+    next()
+  }
+  const admin = localStorage.getItem("admin")
+  if (!admin && to.path !== '/login') {
+    return next("/login")
+  }
+  next()
+})
+
+
 
 export default router

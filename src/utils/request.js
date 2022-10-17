@@ -1,16 +1,16 @@
 import axios from "axios";
 import router from "@/router";
 const request = axios.create({
-    baseURL: 'http://localhost:9090',
-    timeout: 5000
+    baseURL: 'http://localhost:9090/api',
+    timeout: 10000
 })
 
 
 request.interceptors.request.use(config => {
     config.headers['Content-Type'] = 'application/json;charset=utf-8';
-    const admin=localStorage.getItem("admin")
-    if(!admin){
-        router.push("/login")
+    const adminJson = localStorage.getItem("admin")
+    if (adminJson) {
+        config.headers['token'] = JSON.parse(adminJson).token
     }
     return config
 }, error => {
@@ -25,6 +25,12 @@ request.interceptors.response.use(
         if (typeof res === 'string') {
             res = res ? JSON.parse(res) : res
         }
+
+
+        if (res.code === "401") {
+            router.push("/login")
+        }
+
         return res;
     },
     error => {

@@ -1,6 +1,6 @@
 <template>
   <div style="">
-    <!-- 搜索框 -->
+    <!-- =================搜索框=================== -->
     <div style="margin-bottom: 10px">
       <el-input
         placeholder="请输入用户名"
@@ -25,7 +25,9 @@
         <span>重置</span>
       </el-button>
     </div>
-    <!-- 表格数据 -->
+    <!-- =================搜索框end=================== -->
+
+    <!-- ======================表格数据===================== -->
     <el-table :data="tableData" stripe>
       <el-table-column prop="id" label="编号" width="80px"></el-table-column>
       <el-table-column prop="username" label="用户名"></el-table-column>
@@ -33,7 +35,7 @@
       <el-table-column prop="email" label="邮箱"></el-table-column>
       <el-table-column prop="createtime" label="创建时间"></el-table-column>
       <el-table-column prop="updatetime" label="更新时间"></el-table-column>
-      <el-table-column label="操作">
+      <el-table-column label="操作" width="230px">
         <template v-slot="scope">
           <el-button
             type="primary"
@@ -47,10 +49,18 @@
           >
             <el-button slot="reference" type="danger">删除</el-button>
           </el-popconfirm>
+          <el-button
+            type="warning"
+            @click="handleChangePass(scope.row)"
+            style="margin-left: 5px"
+            >修改密码</el-button
+          >
         </template>
       </el-table-column>
     </el-table>
-    <!-- 分页 -->
+    <!-- ======================表格数据end===================== -->
+
+    <!-- ===============分页==================== -->
     <div style="margin-top: 10px">
       <el-pagination
         background
@@ -62,6 +72,28 @@
       >
       </el-pagination>
     </div>
+    <!-- ================分页end================= -->
+
+    <!-- =================修改密码弹框============================ -->
+    <el-dialog title="修改密码" :visible.sync="dialogFormVisible" width="30%">
+      <el-form :model="form" label-width="100px" ref="formRef" :rules="rules">
+        <el-form-item
+          label="新密码"
+          prop="newPass"
+        >
+          <el-input
+            v-model="form.newPass"
+            autocomplete="off"
+            show-password
+          ></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogFormVisible = false">取 消</el-button>
+        <el-button type="primary" @click="savePass">确 定</el-button>
+      </div>
+    </el-dialog>
+    <!-- ==================修改密码弹框end============================= -->
   </div>
 </template>
 
@@ -71,14 +103,25 @@ export default {
   name: "Admin",
   data() {
     return {
+      admin: localStorage.getItem("admin")
+        ? JSON.parse(localStorage.getItem("admin"))
+        : {},
       tableData: [],
+      dialogFormVisible: false,
       total: 0,
+      form: {},
       params: {
         pageNum: 1,
         pageSize: 10,
         username: "",
         phone: "",
-        email:"",
+        email: "",
+      },
+      rules: {
+        newPass: [
+          { required: true, message: "请输入新密码", trigger: "blur" },
+          { min: 3, max: 10, trigger: "blur", message: "长度在3-10个字符" },
+        ],
       },
     };
   },
@@ -86,6 +129,34 @@ export default {
     this.load();
   },
   methods: {
+    // ===========修改密码====================
+    savePass() {
+      this.$refs["formRef"].validate((valid) => {
+        if (valid) {
+          request.put("/admin/password", this.form).then((res) => {
+            if (res.code === "200") {
+              this.$notify.success("修改成功");
+
+              if (this.form.id === this.admin.id) {
+                localStorage.removeItem("admin");
+                this.$router.push("/login");
+              } else {
+                this.dialogFormVisible = false;
+                this.load();
+              }
+            } else {
+              this.$notify.error("修改失败");
+            }
+          });
+        }
+      });
+    },
+    // ==============点击修改按钮触发函数=======================
+    handleChangePass(row) {
+      this.form = JSON.parse(JSON.stringify(row));
+      this.dialogFormVisible = true;
+    },
+    // =================删除=====================
     del(id) {
       request.delete("/admin/delete/" + id).then((res) => {
         if (res.code === "200") {
@@ -102,12 +173,11 @@ export default {
         pageSize: 10,
         username: "",
         phone: "",
-        email:''
+        email: "",
       };
       this.load();
     },
     load() {
-  
       request.get("/admin/page", { params: this.params }).then((res) => {
         if (res.code === "200") {
           this.tableData = res.data.list;
