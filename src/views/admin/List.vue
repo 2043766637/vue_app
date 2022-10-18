@@ -107,7 +107,7 @@
 <script>
 import request from "@/utils/request";
 export default {
-  name: "Admin",
+  name: "AdminList",
   data() {
     return {
       admin: localStorage.getItem("admin")

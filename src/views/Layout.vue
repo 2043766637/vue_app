@@ -21,7 +21,8 @@
       <div style="flex: 1; text-align: right; padding: 0 20px">
         <el-dropdown szie="medium">
           <span class="el-dropdown-link" style="cursor: pointer">
-            {{ admin.username }}<i class="el-icon-arrow-down el-icon--right"></i>
+            {{ admin.username
+            }}<i class="el-icon-arrow-down el-icon--right"></i>
           </span>
           <el-dropdown-menu slot="dropdown" style="margin-top: -5px">
             <el-dropdown-item
@@ -67,6 +68,14 @@
             </template>
             <el-menu-item index="/addAdmin">管理员添加</el-menu-item>
             <el-menu-item index="/adminList">管理员列表</el-menu-item>
+          </el-submenu>
+          <el-submenu index="category">
+            <template slot="title">
+              <i class="el-icon-user"></i>
+              <span> 分类管理 </span>
+            </template>
+            <el-menu-item index="/addCategory">分类添加</el-menu-item>
+            <el-menu-item index="/categoryList">分类列表</el-menu-item>
           </el-submenu>
         </el-menu>
       </div>
