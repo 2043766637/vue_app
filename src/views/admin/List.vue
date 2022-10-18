@@ -35,6 +35,16 @@
       <el-table-column prop="email" label="邮箱"></el-table-column>
       <el-table-column prop="createtime" label="创建时间"></el-table-column>
       <el-table-column prop="updatetime" label="更新时间"></el-table-column>
+      <el-table-column label="状态" width="230px">
+        <template v-slot="scope">
+          <el-switch
+            v-model="scope.row.status"
+            @change="changeStatus(scope.row)"
+            active-color="#13ce66"
+            inactive-color="#ff4949"
+          >
+          </el-switch> </template
+      ></el-table-column>
       <el-table-column label="操作" width="230px">
         <template v-slot="scope">
           <el-button
@@ -77,10 +87,7 @@
     <!-- =================修改密码弹框============================ -->
     <el-dialog title="修改密码" :visible.sync="dialogFormVisible" width="30%">
       <el-form :model="form" label-width="100px" ref="formRef" :rules="rules">
-        <el-form-item
-          label="新密码"
-          prop="newPass"
-        >
+        <el-form-item label="新密码" prop="newPass">
           <el-input
             v-model="form.newPass"
             autocomplete="off"
@@ -128,7 +135,23 @@ export default {
   created() {
     this.load();
   },
+
   methods: {
+    changeStatus(row) {
+      if (this.admin.id === row.id && !row.status) {
+        this.$notify.warning("不可以");
+        row.status = true;
+        return false;
+      }
+      request.put("/admin/update", row).then((res) => {
+        if (res.code === "200") {
+          this.$notify.success("操作成功");
+          this.load();
+        } else {
+          this.$notify.error(res.msg);
+        }
+      });
+    },
     // ===========修改密码====================
     savePass() {
       this.$refs["formRef"].validate((valid) => {

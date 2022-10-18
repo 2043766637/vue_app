@@ -1,5 +1,23 @@
 <template>
-  <div>
+  <div style="position: relative">
+    <el-card class="cover" v-if="loginAdmin.id">
+      <div slot="header"></div>
+      <div>
+        <slide-verify
+          :l="42"
+          :r="10"
+          :w="310"
+          :h="155"
+          :accuracy="10"
+          slider-text="向右滑动"
+          @success="onSuccess"
+          @fail="onFail"
+          @refresh="onRefresh"
+        ></slide-verify>
+        <div>{{ msg }}</div>
+      </div>
+    </el-card>
+
     <div
       style="
         width: 500px;
@@ -59,6 +77,7 @@ export default {
   data() {
     return {
       admin: {},
+      loginAdmin: {},
       rules: {
         username: [
           { required: true, message: "请输入用户名", trigger: "blur" },
@@ -78,11 +97,7 @@ export default {
         if (valid) {
           request.post("/admin/login", this.admin).then((res) => {
             if (res.code === "200") {
-              this.$notify.success("登录成功");
-              if (res.data!==null) {
-                localStorage.setItem("admin", JSON.stringify(res.data));
-              }
-              this.$router.push("/");
+              this.loginAdmin = res.data;
             } else {
               this.$notify.error(res.msg);
             }
@@ -90,6 +105,27 @@ export default {
         }
       });
     },
+
+    onSuccess() {
+      this.$notify.success("登录成功");
+      localStorage.setItem("admin", JSON.stringify(this.loginAdmin));
+      this.$router.push("/");
+    },
+    onFail() {},
+    onRefresh() {},
   },
 };
 </script>
+
+
+<style >
+.cover {
+  width: fit-content;
+  background-color: white;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1000;
+}
+</style>
